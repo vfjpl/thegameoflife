@@ -43,12 +43,12 @@ void life(int **inputarray, int **outputarray)
  	}
 }
 
-int inputhtreadfunction(void *)
+int inputhtreadfunction(void*)
 {
+    SDL_Event event;
     while(!done)
     {
         // message processing loop
-        SDL_Event event;
         while (SDL_WaitEvent(&event))
         {
             // check for messages
@@ -85,6 +85,9 @@ int main ( int argc, char** argv )
     // make sure SDL cleans up before exit
     atexit(SDL_Quit);
 
+    SDL_DisplayMode displaymode;
+    SDL_GetDesktopDisplayMode(0, &displaymode);
+
     // create a new window
     /*
     SDL_Surface* screen = SDL_SetVideoMode(640, 480, 16,
@@ -93,14 +96,22 @@ int main ( int argc, char** argv )
     SDL_Window *window = SDL_CreateWindow("The Game of Life",
                           SDL_WINDOWPOS_UNDEFINED,
                           SDL_WINDOWPOS_UNDEFINED,
-                          640, 480,
+                          displaymode.w/2, displaymode.h/2,
                           0);
     SDL_Surface *screen = SDL_GetWindowSurface(window);
     if ( !screen )
     {
-        printf("Unable to set 640x480 video: %s\n", SDL_GetError());
+        printf("Unable to set %ix%i video: %s\n",screen->w,screen->h, SDL_GetError());
         return 1;
     }
+
+    int **firstarray = (int**)calloc(screen->h+2,sizeof(int*));
+    int **secondarray = (int**)calloc(screen->h+2,sizeof(int*));
+        for(int i=0;i<screen->h+2;i++)
+        {
+            firstarray[i] = (int*)calloc(screen->w+2,sizeof(int));
+            secondarray[i] = (int*)calloc(screen->w+2,sizeof(int));
+        }
 
     // load an image
     SDL_Surface* bmp = SDL_LoadBMP("cb.bmp");
@@ -115,7 +126,7 @@ int main ( int argc, char** argv )
     dstrect.x = (screen->w - bmp->w) / 2;
     dstrect.y = (screen->h - bmp->h) / 2;
 
-    SDL_Thread *inputthread = SDL_CreateThread(inputhtreadfunction,"Input Thread", (void *)NULL);
+    SDL_Thread *inputthread = SDL_CreateThread(inputhtreadfunction,"Input Thread", (void*)NULL);
 
     // program main loop
     while (!done)
@@ -139,6 +150,9 @@ int main ( int argc, char** argv )
 
     // free loaded bitmap
     SDL_FreeSurface(bmp);
+
+    free(firstarray);
+    free(secondarray);
 
     // all is well ;)
     printf("Exited cleanly\n");
