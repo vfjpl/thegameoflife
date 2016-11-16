@@ -8,11 +8,11 @@
 
 bool done = false;
 
-void life(int **inputarray, int **outputarray)
+void life(int **inputarray, int **outputarray, int width, int height)
 {
-    for(int j = 1; j < 51; j++)
+    for(int j = 1; j <= height; j++)
  	{
- 		for(int i = 1; i < 101; i++)
+ 		for(int i = 1; i <= width; i++)
 		{
         //The Moore neighborhood checks all 8 cells surrounding the current cell in the array.
 				int count = 0;
@@ -40,6 +40,17 @@ void life(int **inputarray, int **outputarray)
 					outputarray[j][i] = 1;
             }
         }
+ 	}
+}
+
+void randomtoarray(int **array, int width, int height)
+{
+    for(int j = 1; j <= height; j++)
+ 	{
+ 		for(int i = 1; i <= width; i++)
+		{
+		    array[j][i]=rand()%2;
+		}
  	}
 }
 
@@ -101,16 +112,16 @@ int main ( int argc, char** argv )
     SDL_Surface *screen = SDL_GetWindowSurface(window);
     if ( !screen )
     {
-        printf("Unable to set %ix%i video: %s\n",screen->w,screen->h, SDL_GetError());
+        printf("Unable to set %ix%i video: %s\n", screen->w, screen->h, SDL_GetError());
         return 1;
     }
 
-    int **firstarray = (int**)calloc(screen->h+2,sizeof(int*));
-    int **secondarray = (int**)calloc(screen->h+2,sizeof(int*));
+    int **firstarray = (int**)calloc(screen->h+2, sizeof(int*));
+    int **secondarray = (int**)calloc(screen->h+2, sizeof(int*));
         for(int i=0;i<screen->h+2;i++)
         {
-            firstarray[i] = (int*)calloc(screen->w+2,sizeof(int));
-            secondarray[i] = (int*)calloc(screen->w+2,sizeof(int));
+            firstarray[i] = (int*)calloc(screen->w+2, sizeof(int));
+            secondarray[i] = (int*)calloc(screen->w+2, sizeof(int));
         }
 
     // load an image
@@ -126,7 +137,7 @@ int main ( int argc, char** argv )
     dstrect.x = (screen->w - bmp->w) / 2;
     dstrect.y = (screen->h - bmp->h) / 2;
 
-    SDL_Thread *inputthread = SDL_CreateThread(inputhtreadfunction,"Input Thread", (void*)NULL);
+    SDL_Thread *inputthread = SDL_CreateThread(inputhtreadfunction, "Input Thread", (void*)NULL);
 
     // program main loop
     while (!done)
