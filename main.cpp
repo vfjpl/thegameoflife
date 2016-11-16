@@ -6,6 +6,8 @@
 
 #include <SDL2/SDL.h>
 
+bool done = false;
+
 void life(int **inputarray, int **outputarray)
 {
     for(int j = 1; j < 51; j++)
@@ -39,6 +41,36 @@ void life(int **inputarray, int **outputarray)
             }
         }
  	}
+}
+
+int inputhtreadfunction(void *)
+{
+    while(!done)
+    {
+        // message processing loop
+        SDL_Event event;
+        while (SDL_WaitEvent(&event))
+        {
+            // check for messages
+            switch (event.type)
+            {
+                // exit if the window is closed
+            case SDL_QUIT:
+                done = true;
+                break;
+
+                // check for keypresses
+            case SDL_KEYDOWN:
+                {
+                    // exit if ESCAPE is pressed
+                    if (event.key.keysym.sym == SDLK_ESCAPE)
+                        done = true;
+                    break;
+                }
+            } // end switch
+        } // end of message processing
+    }
+    return 0;
 }
 
 int main ( int argc, char** argv )
@@ -83,33 +115,11 @@ int main ( int argc, char** argv )
     dstrect.x = (screen->w - bmp->w) / 2;
     dstrect.y = (screen->h - bmp->h) / 2;
 
+    SDL_Thread *inputthread = SDL_CreateThread(inputhtreadfunction,"Input Thread", (void *)NULL);
+
     // program main loop
-    bool done = false;
     while (!done)
     {
-        // message processing loop
-        SDL_Event event;
-        while (SDL_PollEvent(&event))
-        {
-            // check for messages
-            switch (event.type)
-            {
-                // exit if the window is closed
-            case SDL_QUIT:
-                done = true;
-                break;
-
-                // check for keypresses
-            case SDL_KEYDOWN:
-                {
-                    // exit if ESCAPE is pressed
-                    if (event.key.keysym.sym == SDLK_ESCAPE)
-                        done = true;
-                    break;
-                }
-            } // end switch
-        } // end of message processing
-
         // DRAWING STARTS HERE
 
         // clear screen
