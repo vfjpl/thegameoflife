@@ -6,6 +6,41 @@
 
 #include <SDL/SDL.h>
 
+void life(int **inputarray, int **outputarray)
+{
+    for(int j = 1; j < 51; j++)
+ 	{
+ 		for(int i = 1; i < 101; i++)
+		{
+        //The Moore neighborhood checks all 8 cells surrounding the current cell in the array.
+				int count = 0;
+				count = inputarray[j-1][i] +
+					inputarray[j-1][i-1] +
+					inputarray[j][i-1] +
+					inputarray[j+1][i-1] +
+					inputarray[j+1][i] +
+					inputarray[j+1][i+1] +
+					inputarray[j][i+1] +
+					inputarray[j-1][i+1];
+				//The cell dies.
+            if(count < 2 || count > 3)
+            {
+					outputarray[j][i] = 0;
+            }
+				//The cell stays the same.
+            if(count == 2)
+            {
+					outputarray[j][i] = inputarray[j][i];
+            }
+				//The cell either stays alive, or is "born".
+            if(count == 3)
+            {
+					outputarray[j][i] = 1;
+            }
+        }
+ 	}
+}
+
 int main ( int argc, char** argv )
 {
     // initialize SDL video
