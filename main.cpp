@@ -4,7 +4,7 @@
     #include <stdlib.h>
 #endif
 
-#include <SDL/SDL.h>
+#include <SDL2/SDL.h>
 
 void life(int **inputarray, int **outputarray)
 {
@@ -54,8 +54,16 @@ int main ( int argc, char** argv )
     atexit(SDL_Quit);
 
     // create a new window
+    /*
     SDL_Surface* screen = SDL_SetVideoMode(640, 480, 16,
                                            SDL_HWSURFACE|SDL_DOUBLEBUF);
+    */
+    SDL_Window *window = SDL_CreateWindow("The Game of Life",
+                          SDL_WINDOWPOS_UNDEFINED,
+                          SDL_WINDOWPOS_UNDEFINED,
+                          640, 480,
+                          0);
+    SDL_Surface *screen = SDL_GetWindowSurface(window);
     if ( !screen )
     {
         printf("Unable to set 640x480 video: %s\n", SDL_GetError());
@@ -69,7 +77,7 @@ int main ( int argc, char** argv )
         printf("Unable to load bitmap: %s\n", SDL_GetError());
         return 1;
     }
-    
+
     // centre the bitmap on screen
     SDL_Rect dstrect;
     dstrect.x = (screen->w - bmp->w) / 2;
@@ -103,7 +111,7 @@ int main ( int argc, char** argv )
         } // end of message processing
 
         // DRAWING STARTS HERE
-        
+
         // clear screen
         SDL_FillRect(screen, 0, SDL_MapRGB(screen->format, 0, 0, 0));
 
@@ -113,7 +121,10 @@ int main ( int argc, char** argv )
         // DRAWING ENDS HERE
 
         // finally, update the screen :)
+        /*
         SDL_Flip(screen);
+        */
+        SDL_UpdateWindowSurface(window);
     } // end main loop
 
     // free loaded bitmap
