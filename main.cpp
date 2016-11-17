@@ -8,8 +8,9 @@
 
 bool done = false;
 
-void life(int **inputarray, int **outputarray, int width, int height)
+void life(int **inputarray, int **outputarray, int width, int height, SDL_Rect *pixels, int howmuchpixels)
 {
+    howmuchpixels=0;
     for(int j = 1; j <= height; j++)
  	{
  		for(int i = 1; i <= width; i++)
@@ -32,24 +33,33 @@ void life(int **inputarray, int **outputarray, int width, int height)
 				//The cell stays the same.
             if(count == 2)
             {
-					outputarray[j][i] = inputarray[j][i];
+					if((outputarray[j][i] = inputarray[j][i])==1);
+                    {
+                        pixels[howmuchpixels].y=j;
+                        pixels[howmuchpixels].x=i;
+                        howmuchpixels++;
+                    }
             }
 				//The cell either stays alive, or is "born".
             if(count == 3)
             {
 					outputarray[j][i] = 1;
+					pixels[howmuchpixels].y=j;
+					pixels[howmuchpixels].x=i;
+					howmuchpixels++;
             }
         }
  	}
 }
 
-void randomtoarray(int **array, int width, int height)
+void randomtoarray(int **array, int width, int height, int factor)
 {
     for(int j = 1; j <= height; j++)
  	{
  		for(int i = 1; i <= width; i++)
 		{
-		    array[j][i]=rand()%2;
+		    if((array[j][i]=random()%(factor))>1)
+                array[j][i]=0;
 		}
  	}
 }
@@ -107,12 +117,12 @@ int main ( int argc, char** argv )
     SDL_Window *window = SDL_CreateWindow("The Game of Life",
                           SDL_WINDOWPOS_UNDEFINED,
                           SDL_WINDOWPOS_UNDEFINED,
-                          displaymode.w/2, displaymode.h/2,
+                          640, 480,
                           0);
     SDL_Surface *screen = SDL_GetWindowSurface(window);
     if ( !screen )
     {
-        printf("Unable to set %ix%i video: %s\n", screen->w, screen->h, SDL_GetError());
+        printf("Unable to set 640x480 video: %s\n", SDL_GetError());
         return 1;
     }
 
@@ -123,6 +133,14 @@ int main ( int argc, char** argv )
             firstarray[i] = (int*)calloc(screen->w+2, sizeof(int));
             secondarray[i] = (int*)calloc(screen->w+2, sizeof(int));
         }
+
+    SDL_Rect pixels[screen->w*screen->h];
+
+    for(int i=0;i<screen->w*screen->h;i++)
+    {
+            pixels[i].h=1;
+            pixels[i].w=1;
+    }
 
     // load an image
     SDL_Surface* bmp = SDL_LoadBMP("cb.bmp");
@@ -137,7 +155,7 @@ int main ( int argc, char** argv )
     dstrect.x = (screen->w - bmp->w) / 2;
     dstrect.y = (screen->h - bmp->h) / 2;
 
-    SDL_Thread *inputthread = SDL_CreateThread(inputhtreadfunction, "Input Thread", (void*)NULL);
+    SDL_Thread *inputthread = SDL_CreateThread(inputhtreadfunction, "Input Thread", 0);
 
     // program main loop
     while (!done)
