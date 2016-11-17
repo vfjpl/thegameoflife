@@ -7,8 +7,9 @@
 #include <SDL2/SDL.h>
 
 bool done = false;
+int howmuchpixels = 0;
 
-void life(int **inputarray, int **outputarray, int width, int height, SDL_Rect *pixels, int howmuchpixels)
+void life(int **inputarray, int **outputarray, int width, int height, SDL_Rect *pixels)
 {
     howmuchpixels=0;
     for(int j = 1; j <= height; j++)
@@ -35,8 +36,8 @@ void life(int **inputarray, int **outputarray, int width, int height, SDL_Rect *
             {
 					if((outputarray[j][i] = inputarray[j][i])==1);
                     {
-                        pixels[howmuchpixels].y=j;
-                        pixels[howmuchpixels].x=i;
+                        pixels[howmuchpixels].y=j-1;
+                        pixels[howmuchpixels].x=i-1;
                         howmuchpixels++;
                     }
             }
@@ -44,8 +45,8 @@ void life(int **inputarray, int **outputarray, int width, int height, SDL_Rect *
             if(count == 3)
             {
 					outputarray[j][i] = 1;
-					pixels[howmuchpixels].y=j;
-					pixels[howmuchpixels].x=i;
+					pixels[howmuchpixels].y=j-1;
+					pixels[howmuchpixels].x=i-1;
 					howmuchpixels++;
             }
         }
@@ -135,7 +136,6 @@ int main ( int argc, char** argv )
         }
 
     SDL_Rect pixels[screen->w*screen->h];
-
     for(int i=0;i<screen->w*screen->h;i++)
     {
             pixels[i].h=1;
