@@ -9,6 +9,9 @@
 bool done = false;
 int howmuchpixels = 0;
 
+int **firstarray;
+int **secondarray;
+
 void life(int **inputarray, int **outputarray, int width, int height, SDL_Rect *pixels)
 {
     howmuchpixels=0;
@@ -34,7 +37,7 @@ void life(int **inputarray, int **outputarray, int width, int height, SDL_Rect *
 				//The cell stays the same.
             if(count == 2)
             {
-					if((outputarray[j][i] = inputarray[j][i])==1);
+					if((outputarray[j][i] = inputarray[j][i])==1)
                     {
                         pixels[howmuchpixels].y=j-1;
                         pixels[howmuchpixels].x=i-1;
@@ -48,6 +51,23 @@ void life(int **inputarray, int **outputarray, int width, int height, SDL_Rect *
 					pixels[howmuchpixels].y=j-1;
 					pixels[howmuchpixels].x=i-1;
 					howmuchpixels++;
+            }
+        }
+ 	}
+}
+
+void arraytopixels(int **array, int width, int height, SDL_Rect *pixels)
+{
+    howmuchpixels=0;
+    for(int j = 1; j <= height; j++)
+ 	{
+ 		for(int i = 1; i <= width; i++)
+		{
+		    if(array[j][i]==1)
+            {
+                pixels[howmuchpixels].y=j-1;
+                pixels[howmuchpixels].x=i-1;
+                howmuchpixels++;
             }
         }
  	}
@@ -89,6 +109,18 @@ int inputhtreadfunction(void*)
                         done = true;
                     break;
                 }
+            case SDL_MOUSEMOTION:
+                {
+                    if(event.button.button == SDL_BUTTON_LEFT)
+                    firstarray[event.motion.y][event.motion.x]=1;
+                    break;
+                }
+            case SDL_MOUSEBUTTONDOWN:
+                {
+                    if(event.button.button == SDL_BUTTON_LEFT)
+                    firstarray[event.motion.y][event.motion.x]=1;
+                    break;
+                }
             } // end switch
         } // end of message processing
     }
@@ -127,8 +159,8 @@ int main ( int argc, char** argv )
         return 1;
     }
 
-    int **firstarray = (int**)calloc(screen->h+2, sizeof(int*));
-    int **secondarray = (int**)calloc(screen->h+2, sizeof(int*));
+    firstarray = (int**)calloc(screen->h+2, sizeof(int*));
+    secondarray = (int**)calloc(screen->h+2, sizeof(int*));
         for(int i=0;i<screen->h+2;i++)
         {
             firstarray[i] = (int*)calloc(screen->w+2, sizeof(int));
@@ -167,6 +199,8 @@ int main ( int argc, char** argv )
 
         // draw bitmap
         SDL_BlitSurface(bmp, 0, screen, &dstrect);
+        arraytopixels(firstarray,screen->w,screen->h,pixels);
+        SDL_FillRects(screen,pixels,howmuchpixels,SDL_MapRGB(screen->format, 255, 255, 255));
 
         // DRAWING ENDS HERE
 
