@@ -10,10 +10,15 @@ bool done = false;
 bool pause = true;
 int howmuchpixels = 0;
 
+int width = 800;
+int height = 600;
+
 int **firstarray;
 int **secondarray;
 
-void life(int **inputarray, int **outputarray, int width, int height, SDL_Rect *pixels)
+SDL_Rect pixels[ 1280 * 800 ];
+
+void life(int **inputarray, int **outputarray)
 {
     howmuchpixels=0;
     for(int j = 1; j <= height; j++)
@@ -38,10 +43,10 @@ void life(int **inputarray, int **outputarray, int width, int height, SDL_Rect *
 				//The cell stays the same.
             else if(count == 2)
             {
-					if((outputarray[j][i] = inputarray[j][i])==1)
+					if((outputarray[j][i] = inputarray[j][i]) == 1)
                     {
-                        pixels[howmuchpixels].y=j-1;
-                        pixels[howmuchpixels].x=i-1;
+                        pixels[howmuchpixels].y = j-1;
+                        pixels[howmuchpixels].x = i-1;
                         howmuchpixels++;
                     }
             }
@@ -49,15 +54,15 @@ void life(int **inputarray, int **outputarray, int width, int height, SDL_Rect *
             else if(count == 3)
             {
 					outputarray[j][i] = 1;
-					pixels[howmuchpixels].y=j-1;
-					pixels[howmuchpixels].x=i-1;
+					pixels[howmuchpixels].y = j-1;
+					pixels[howmuchpixels].x = i-1;
 					howmuchpixels++;
             }
         }
  	}
 }
 
-void arraytopixels(int **array, int width, int height, SDL_Rect *pixels)
+void arraytopixels(int **array)
 {
     howmuchpixels=0;
     for(int j = 1; j <= height; j++)
@@ -66,22 +71,33 @@ void arraytopixels(int **array, int width, int height, SDL_Rect *pixels)
 		{
 		    if(array[j][i]==1)
             {
-                pixels[howmuchpixels].y=j-1;
-                pixels[howmuchpixels].x=i-1;
+                pixels[howmuchpixels].y = j-1;
+                pixels[howmuchpixels].x = i-1;
                 howmuchpixels++;
             }
         }
  	}
 }
 
-void randomtoarray(int **array, int width, int height, int factor)
+void randomtoarray(int **array, int factor)
 {
     for(int j = 1; j <= height; j++)
  	{
  		for(int i = 1; i <= width; i++)
 		{
-		    if(random()%(factor)==1)
-                array[j][i]=1;
+		    if(random()%(factor)==0)
+                array[j][i] = 1;
+		}
+ 	}
+}
+
+void cleararray(int **array)
+{
+    for(int j = 1; j <= height; j++)
+ 	{
+ 		for(int i = 1; i <= width; i++)
+		{
+                array[j][i] = 0;
 		}
  	}
 }
@@ -110,19 +126,23 @@ int inputhtreadfunction(void*)
                         done = true;
                     else if (event.key.keysym.sym == SDLK_SPACE)
                         pause = !pause;
+                    else if (event.key.keysym.sym == SDLK_r && pause == 1)
+                        randomtoarray(firstarray, 18);
+                    else if (event.key.keysym.sym == SDLK_c && pause == 1)
+                        cleararray(firstarray);
                     break;
                 }
+
             case SDL_MOUSEMOTION:
                 {
-                    if(event.button.button == SDL_BUTTON_LEFT)
-                        if(pause==1)
+                    if(event.button.button == SDL_BUTTON_LEFT && pause == 1)
                         firstarray[event.motion.y+1][event.motion.x+1]=1;
                     break;
                 }
+
             case SDL_MOUSEBUTTONDOWN:
                 {
-                    if(event.button.button == SDL_BUTTON_LEFT)
-                        if(pause==1)
+                    if(event.button.button == SDL_BUTTON_LEFT && pause ==1)
                         firstarray[event.motion.y+1][event.motion.x+1]=1;
                     break;
                 }
@@ -155,34 +175,34 @@ int main ( int argc, char** argv )
     SDL_Window *window = SDL_CreateWindow("The Game of Life",
                           SDL_WINDOWPOS_UNDEFINED,
                           SDL_WINDOWPOS_UNDEFINED,
-                          640, 480,
+                          width, height,
                           0);
     SDL_Surface *screen = SDL_GetWindowSurface(window);
+
+    height = screen->h;
+    width = screen->w;
+
     if ( !screen )
     {
-        printf("Unable to set 640x480 video: %s\n", SDL_GetError());
+        printf("Unable to set %ix%i video: %s\n",width, height, SDL_GetError());
         return 1;
     }
 
-    int height=screen->h;
-    int width=screen->w;
-
     firstarray = (int**)calloc(height+2, sizeof(int*));
     secondarray = (int**)calloc(height+2, sizeof(int*));
-        for(int i=0;i<height+2;i++)
+    for(int i=0;i<height+2;i++)
         {
             firstarray[i] = (int*)calloc(width+2, sizeof(int));
             secondarray[i] = (int*)calloc(width+2, sizeof(int));
         }
 
-    SDL_Rect pixels[width*height];
     for(int i=0;i<width*height;i++)
-    {
+        {
             pixels[i].h=1;
             pixels[i].w=1;
-    }
-
+        }
     // load an image
+    /*
     SDL_Surface* bmp = SDL_LoadBMP("cb.bmp");
     if (!bmp)
     {
@@ -194,31 +214,32 @@ int main ( int argc, char** argv )
     SDL_Rect dstrect;
     dstrect.x = (screen->w - bmp->w) / 2;
     dstrect.y = (screen->h - bmp->h) / 2;
+    */
 
     SDL_Thread *inputthread = SDL_CreateThread(inputhtreadfunction, "Input Thread", 0);
-
-    //randomtoarray(firstarray,width,height,30);
 
     // program main loop
     while (!done)
     {
         if(pause==0)
         {
+            SDL_Delay(0);
             SDL_FillRect(screen, 0, SDL_MapRGB(screen->format, 0, 0, 0));
-            life(firstarray,secondarray,width,height,pixels);
+            life(firstarray,secondarray);
             SDL_FillRects(screen,pixels,howmuchpixels,SDL_MapRGB(screen->format, 255, 255, 255));
             SDL_UpdateWindowSurface(window);
 
+            SDL_Delay(0);
             SDL_FillRect(screen, 0, SDL_MapRGB(screen->format, 0, 0, 0));
-            life(secondarray,firstarray,width,height,pixels);
+            life(secondarray,firstarray);
             SDL_FillRects(screen,pixels,howmuchpixels,SDL_MapRGB(screen->format, 255, 255, 255));
             SDL_UpdateWindowSurface(window);
         }
         else if(pause==1)
         {
-            SDL_Delay(10);
+            SDL_Delay(6);
             SDL_FillRect(screen, 0, SDL_MapRGB(screen->format, 0, 0, 0));
-            arraytopixels(firstarray,width,height,pixels);
+            arraytopixels(firstarray);
             SDL_FillRects(screen,pixels,howmuchpixels,SDL_MapRGB(screen->format, 255, 255, 255));
             SDL_UpdateWindowSurface(window);
         }
@@ -236,11 +257,12 @@ int main ( int argc, char** argv )
         /*
         SDL_Flip(screen);
         */
-        //SDL_UpdateWindowSurface(window);
     } // end main loop
 
     // free loaded bitmap
+    /*
     SDL_FreeSurface(bmp);
+    */
 
     free(firstarray);
     free(secondarray);
