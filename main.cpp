@@ -13,20 +13,27 @@ int howmuchpixels = 0;
 int width = 800;
 int height = 600;
 
+
+int factor = 18;
+
+int mouselastposition_x = 0;
+int mouselastposition_y = 0;
+
 int **firstarray;
 int **secondarray;
 
-SDL_Rect pixels[ 1280 * 800 ];
+SDL_Rect pixels[ 1920 * 1080 ];
 
-void life(int **inputarray, int **outputarray)
+void life( int **inputarray, int **outputarray )
 {
-    howmuchpixels=0;
+    int count = 0;
+    howmuchpixels = 0;
+
     for(int j = 1; j <= height; j++)
  	{
  		for(int i = 1; i <= width; i++)
 		{
         //The Moore neighborhood checks all 8 cells surrounding the current cell in the array.
-				int count = 0;
 				count = inputarray[j-1][i] +
 					inputarray[j-1][i-1] +
 					inputarray[j][i-1] +
@@ -62,14 +69,14 @@ void life(int **inputarray, int **outputarray)
  	}
 }
 
-void arraytopixels(int **array)
+void arraytopixels( int **array )
 {
-    howmuchpixels=0;
+    howmuchpixels = 0;
     for(int j = 1; j <= height; j++)
  	{
  		for(int i = 1; i <= width; i++)
 		{
-		    if(array[j][i]==1)
+		    if(array[j][i] == 1)
             {
                 pixels[howmuchpixels].y = j-1;
                 pixels[howmuchpixels].x = i-1;
@@ -79,19 +86,43 @@ void arraytopixels(int **array)
  	}
 }
 
-void randomtoarray(int **array, int factor)
+void copyedges(int **array)
+{
+    array[0][0]=array[height][width];
+
+    for(int i=1;i<=width;i++)
+        array[0][i]=array[height][i];
+
+    array[0][width+1]=array[height][1];
+
+    for(int i=1;i<=height;i++)
+        array[i][width+1]=array[i][1];
+
+    array[height+1][width+1]=array[1][1];
+
+    for(int i=width;i>=1;i--)
+        array[height+1][i]=array[1][i];
+
+    array[height+1][0]=array[1][width];
+
+    for(int i=height;i>=1;i--)
+        array[i][0]=array[i][width];
+
+}
+
+void randomtoarray( int **array, int randomfactor )
 {
     for(int j = 1; j <= height; j++)
  	{
  		for(int i = 1; i <= width; i++)
 		{
-		    if(random()%(factor)==0)
+		    if(random() % randomfactor == 0)
                 array[j][i] = 1;
 		}
  	}
 }
 
-void cleararray(int **array)
+void cleararray( int **array )
 {
     for(int j = 1; j <= height; j++)
  	{
@@ -105,7 +136,7 @@ void cleararray(int **array)
 int inputhtreadfunction(void*)
 {
     SDL_Event event;
-    while(!done)
+    while (!done)
     {
         // message processing loop
         while (SDL_WaitEvent(&event))
@@ -115,35 +146,79 @@ int inputhtreadfunction(void*)
             {
                 // exit if the window is closed
             case SDL_QUIT:
-                done = true;
-                break;
-
+                {
+                    done = true;
+                    break;
+                }
                 // check for keypresses
             case SDL_KEYDOWN:
                 {
-                    // exit if ESCAPE is pressed
-                    if (event.key.keysym.sym == SDLK_ESCAPE)
-                        done = true;
-                    else if (event.key.keysym.sym == SDLK_SPACE)
-                        pause = !pause;
-                    else if (event.key.keysym.sym == SDLK_r && pause == 1)
-                        randomtoarray(firstarray, 18);
-                    else if (event.key.keysym.sym == SDLK_c && pause == 1)
-                        cleararray(firstarray);
+
+                    switch(event.key.keysym.sym)
+                    {
+                        // exit if ESCAPE is pressed
+                    case SDLK_ESCAPE:
+                        {
+                            done = true;
+                            break;
+                        }
+
+                    case SDLK_SPACE:
+                        {
+                            pause = !pause;
+                            break;
+                        }
+
+                    case SDLK_r:
+                        {
+                            if(pause == 1)
+                                randomtoarray( firstarray, factor );
+                            break;
+                        }
+
+                    case SDLK_c:
+                        {
+                            if(pause == 1)
+                                cleararray( firstarray );
+                            break;
+                        }
+
+                    case SDLK_EQUALS:
+                        {
+                            if(factor>1)
+                                factor--;
+
+                            break;
+                        }
+
+                    case SDLK_MINUS:
+                        {
+                            factor++;
+
+                            break;
+                        }
+                    }
                     break;
                 }
 
             case SDL_MOUSEMOTION:
                 {
+                    mouselastposition_x=event.motion.x;
+                    mouselastposition_y=event.motion.y;
+
                     if(event.button.button == SDL_BUTTON_LEFT && pause == 1)
-                        firstarray[event.motion.y+1][event.motion.x+1]=1;
+                        firstarray[mouselastposition_y+1][mouselastposition_x+1] = 1;
+
                     break;
                 }
 
             case SDL_MOUSEBUTTONDOWN:
                 {
-                    if(event.button.button == SDL_BUTTON_LEFT && pause ==1)
-                        firstarray[event.motion.y+1][event.motion.x+1]=1;
+                    if(event.button.button == SDL_BUTTON_LEFT && pause == 1)
+                        firstarray[event.motion.y+1][event.motion.x+1] = 1;
+
+                    mouselastposition_x=event.motion.x;
+                    mouselastposition_y=event.motion.y;
                     break;
                 }
             } // end switch
@@ -165,7 +240,7 @@ int main ( int argc, char** argv )
     atexit(SDL_Quit);
 
     SDL_DisplayMode displaymode;
-    SDL_GetDesktopDisplayMode(0, &displaymode);
+    SDL_GetDesktopDisplayMode( 0, &displaymode );
 
     // create a new window
     /*
@@ -198,8 +273,8 @@ int main ( int argc, char** argv )
 
     for(int i=0;i<width*height;i++)
         {
-            pixels[i].h=1;
-            pixels[i].w=1;
+            pixels[i].h = 1;
+            pixels[i].w = 1;
         }
     // load an image
     /*
@@ -224,12 +299,15 @@ int main ( int argc, char** argv )
         if(pause==0)
         {
             SDL_Delay(0);
+            copyedges(firstarray);
             SDL_FillRect(screen, 0, SDL_MapRGB(screen->format, 0, 0, 0));
             life(firstarray,secondarray);
             SDL_FillRects(screen,pixels,howmuchpixels,SDL_MapRGB(screen->format, 255, 255, 255));
             SDL_UpdateWindowSurface(window);
 
+
             SDL_Delay(0);
+            copyedges(secondarray);
             SDL_FillRect(screen, 0, SDL_MapRGB(screen->format, 0, 0, 0));
             life(secondarray,firstarray);
             SDL_FillRects(screen,pixels,howmuchpixels,SDL_MapRGB(screen->format, 255, 255, 255));
