@@ -10,9 +10,9 @@ bool done = false;
 bool pause = true;
 int howmuchpixels = 0;
 
-int width = 800;
-int height = 600;
-
+int width = 640;
+int height = 480;
+unsigned int fullscreen=0;
 
 int factor = 18;
 
@@ -26,7 +26,7 @@ SDL_Rect pixels[ 1920 * 1080 ];
 
 void life( int **inputarray, int **outputarray )
 {
-    int count = 0;
+    int count;
     howmuchpixels = 0;
 
     for(int j = 1; j <= height; j++)
@@ -84,6 +84,15 @@ void arraytopixels( int **array )
             }
         }
  	}
+}
+
+void glidertoarray(int **array)
+{
+    array[height/2][width/2]=1;
+    array[height/2][width/2+1]=1;
+    array[height/2][width/2+2]=1;
+    array[height/2+1][width/2]=1;
+    array[height/2+2][width/2+2]=1;
 }
 
 void copyedges(int **array)
@@ -153,7 +162,6 @@ int inputhtreadfunction(void*)
                 // check for keypresses
             case SDL_KEYDOWN:
                 {
-
                     switch(event.key.keysym.sym)
                     {
                         // exit if ESCAPE is pressed
@@ -166,6 +174,7 @@ int inputhtreadfunction(void*)
                     case SDLK_SPACE:
                         {
                             pause = !pause;
+                            SDL_ShowCursor(!SDL_ShowCursor(-1));
                             break;
                         }
 
@@ -187,14 +196,18 @@ int inputhtreadfunction(void*)
                         {
                             if(factor>1)
                                 factor--;
-
                             break;
                         }
 
                     case SDLK_MINUS:
                         {
                             factor++;
+                            break;
+                        }
 
+                    case SDLK_g:
+                        {
+                            glidertoarray(firstarray);
                             break;
                         }
                     }
@@ -214,11 +227,12 @@ int inputhtreadfunction(void*)
 
             case SDL_MOUSEBUTTONDOWN:
                 {
-                    if(event.button.button == SDL_BUTTON_LEFT && pause == 1)
-                        firstarray[event.motion.y+1][event.motion.x+1] = 1;
-
                     mouselastposition_x=event.motion.x;
                     mouselastposition_y=event.motion.y;
+
+                    if(event.button.button == SDL_BUTTON_LEFT && pause == 1)
+                        firstarray[mouselastposition_y+1][mouselastposition_x+1] = 1;
+
                     break;
                 }
             } // end switch
@@ -229,6 +243,42 @@ int inputhtreadfunction(void*)
 
 int main ( int argc, char** argv )
 {
+
+    for(int i=1;i<argc;i++)
+    {
+        if(strcmp("--width",argv[i])==0)
+        {
+            width=strtol(argv[i+1],0,0);
+        }
+        else if(strcmp("--height",argv[i])==0)
+        {
+            height=strtol(argv[i+1],0,0);
+        }
+        else if(strcmp("--help",argv[i])==0)
+        {
+            printf("--width\n--height\n--fulscreen\n--windowed\n--factor\n--newrender\n--help\n");
+            return 0;
+        }
+        else if(strcmp("--fullscreen",argv[i])==0)
+        {
+            fullscreen=SDL_WINDOW_FULLSCREEN_DESKTOP;
+        }
+        else if(strcmp("--factor",argv[i])==0)
+        {
+            factor=strtol(argv[i+1],0,0);
+        }
+        else if(strcmp("--windowed",argv[i])==0)
+        {
+            fullscreen=0;
+        }
+        else if(strcmp("--newrender",argv[i])==0)
+        {
+            printf("Work in progress…\n");
+            return 0;
+        }
+    }
+
+
     // initialize SDL video
     if ( SDL_Init( SDL_INIT_VIDEO ) < 0 )
     {
@@ -251,7 +301,7 @@ int main ( int argc, char** argv )
                           SDL_WINDOWPOS_UNDEFINED,
                           SDL_WINDOWPOS_UNDEFINED,
                           width, height,
-                          0);
+                          fullscreen);
     SDL_Surface *screen = SDL_GetWindowSurface(window);
 
     height = screen->h;
@@ -298,7 +348,7 @@ int main ( int argc, char** argv )
     {
         if(pause==0)
         {
-            SDL_Delay(0);
+            SDL_Delay(2);
             copyedges(firstarray);
             SDL_FillRect(screen, 0, SDL_MapRGB(screen->format, 0, 0, 0));
             life(firstarray,secondarray);
@@ -306,7 +356,7 @@ int main ( int argc, char** argv )
             SDL_UpdateWindowSurface(window);
 
 
-            SDL_Delay(0);
+            SDL_Delay(2);
             copyedges(secondarray);
             SDL_FillRect(screen, 0, SDL_MapRGB(screen->format, 0, 0, 0));
             life(secondarray,firstarray);
@@ -315,7 +365,7 @@ int main ( int argc, char** argv )
         }
         else if(pause==1)
         {
-            SDL_Delay(6);
+            SDL_Delay(5);
             SDL_FillRect(screen, 0, SDL_MapRGB(screen->format, 0, 0, 0));
             arraytopixels(firstarray);
             SDL_FillRects(screen,pixels,howmuchpixels,SDL_MapRGB(screen->format, 255, 255, 255));
