@@ -8,7 +8,6 @@
 
 bool done = false;
 bool pause = true;
-int howmuchpixels = 0;
 
 int width = 640;
 int height = 480;
@@ -16,8 +15,11 @@ unsigned int fullscreen=0;
 
 int factor = 18;
 
-int mouselastposition_x = 0;
-int mouselastposition_y = 0;
+int mouselastposition_x;
+int mouselastposition_y;
+
+int howmuchpixels;
+bool arrayused;
 
 int **firstarray;
 int **secondarray;
@@ -180,14 +182,14 @@ int inputhtreadfunction(void*)
 
                     case SDLK_r:
                         {
-                            if(pause == 1)
+                            if(arrayused == 0)
                                 randomtoarray( firstarray, factor );
                             break;
                         }
 
                     case SDLK_c:
                         {
-                            if(pause == 1)
+                            if(arrayused == 0)
                                 cleararray( firstarray );
                             break;
                         }
@@ -207,7 +209,8 @@ int inputhtreadfunction(void*)
 
                     case SDLK_g:
                         {
-                            glidertoarray(firstarray);
+                            if(arrayused == 0)
+                                glidertoarray(firstarray);
                             break;
                         }
                     }
@@ -219,7 +222,7 @@ int inputhtreadfunction(void*)
                     mouselastposition_x=event.motion.x;
                     mouselastposition_y=event.motion.y;
 
-                    if(event.button.button == SDL_BUTTON_LEFT && pause == 1)
+                    if(event.button.button == SDL_BUTTON_LEFT && arrayused == 0)
                         firstarray[mouselastposition_y+1][mouselastposition_x+1] = 1;
 
                     break;
@@ -230,7 +233,7 @@ int inputhtreadfunction(void*)
                     mouselastposition_x=event.motion.x;
                     mouselastposition_y=event.motion.y;
 
-                    if(event.button.button == SDL_BUTTON_LEFT && pause == 1)
+                    if(event.button.button == SDL_BUTTON_LEFT && arrayused == 0)
                         firstarray[mouselastposition_y+1][mouselastposition_x+1] = 1;
 
                     break;
@@ -304,13 +307,19 @@ int main ( int argc, char** argv )
                           fullscreen);
     SDL_Surface *screen = SDL_GetWindowSurface(window);
 
-    height = screen->h;
-    width = screen->w;
-
     if ( !screen )
     {
-        printf("Unable to set %ix%i video: %s\n",width, height, SDL_GetError());
+        if(fullscreen==0)
+            printf("Unable to set %ix%i video: %s\n", width, height, SDL_GetError());
+        else
+            printf("Unable to set fullscreen video: %s\n", SDL_GetError());
+
         return 1;
+    }
+    else
+    {
+        height = screen->h;
+        width = screen->w;
     }
 
     firstarray = (int**)calloc(height+2, sizeof(int*));
@@ -346,11 +355,12 @@ int main ( int argc, char** argv )
     // program main loop
     while (!done)
     {
-        if(pause==0)
+        if(!pause)
         {
             SDL_Delay(2);
             copyedges(firstarray);
             SDL_FillRect(screen, 0, SDL_MapRGB(screen->format, 0, 0, 0));
+            arrayused=1;
             life(firstarray,secondarray);
             SDL_FillRects(screen,pixels,howmuchpixels,SDL_MapRGB(screen->format, 255, 255, 255));
             SDL_UpdateWindowSurface(window);
@@ -359,11 +369,12 @@ int main ( int argc, char** argv )
             SDL_Delay(2);
             copyedges(secondarray);
             SDL_FillRect(screen, 0, SDL_MapRGB(screen->format, 0, 0, 0));
+            arrayused=0;
             life(secondarray,firstarray);
             SDL_FillRects(screen,pixels,howmuchpixels,SDL_MapRGB(screen->format, 255, 255, 255));
             SDL_UpdateWindowSurface(window);
         }
-        else if(pause==1)
+        else
         {
             SDL_Delay(5);
             SDL_FillRect(screen, 0, SDL_MapRGB(screen->format, 0, 0, 0));
