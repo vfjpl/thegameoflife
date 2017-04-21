@@ -549,7 +549,7 @@ int main ( int argc, char** argv )
         if(fullscreen!=1)
             printf("Unable to set %ix%i video: %s\n", width, height, SDL_GetError());
         else
-            printf("Unable to set fullscreen %ix%i video: %s\n", width, height, SDL_GetError());
+            printf("Unable to set fullscreen video: %s\n", SDL_GetError());
 
         return 1;
     }
