@@ -505,11 +505,7 @@ int main ( int argc, char** argv )
         }
         else if(strcmp("--delay",argv[i])==0)
         {
-            if((msdelay=atoi(argv[++i]))<0)
-            {
-                printf("Bad value for delay…\n");
-                return 0;
-            }
+            msdelay=strtoul(argv[++i]);
         }
         else if(strcmp("--oldmouse",argv[i])==0)
         {
