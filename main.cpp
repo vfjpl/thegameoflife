@@ -221,6 +221,7 @@ void line(int x0, int y0, int x1, int y1, bool **array)
 
 }
 
+/*
 void line_alt(float x0, float y0, float x1, float y1, bool **array)
 {
     float x;
@@ -241,6 +242,7 @@ void line_alt(float x0, float y0, float x1, float y1, bool **array)
 
     }
 }
+*/
 
 int inputhtreadfunction(void*)
 {
