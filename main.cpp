@@ -333,7 +333,7 @@ int inputhtreadfunction(void*)
                     break;
                 }
 
-                                case SDLK_3:
+                case SDLK_3:
                 {
                     if(!arrayused)
                         dakota( firstarray );
@@ -505,7 +505,7 @@ int main ( int argc, char** argv )
         }
         else if(strcmp("--delay",argv[i])==0)
         {
-            msdelay=strtoul(argv[++i]);
+            msdelay=strtoul(argv[++i],NULL,0);
         }
         else if(strcmp("--oldmouse",argv[i])==0)
         {
