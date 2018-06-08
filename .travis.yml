@@ -1,5 +1,5 @@
 language: cpp
 
-before_install: sudo aptitude update
+before_install: sudo aptitude update || true
 
 script: make -f thegameoflife.cbp.mak
