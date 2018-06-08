@@ -1,9 +1,3 @@
-#ifdef __cplusplus
-#include <cstdlib>
-#else
-#include <stdlib.h>
-#endif
-
 #include <SDL2/SDL.h>
 
 bool done = false;
@@ -584,7 +578,7 @@ int main ( int argc, char** argv )
 
     newgetperformancecounter = SDL_GetPerformanceCounter();
     mutex = SDL_CreateMutex();
-    SDL_Thread *inputthread = SDL_CreateThread(inputhtreadfunction, "Input Thread", nullptr);
+    SDL_Thread *inputthread = SDL_CreateThread(inputhtreadfunction, "Input Thread", NULL);
 
     // program main loop
     while (!done)
