@@ -1,7 +1,7 @@
 language: cpp
 
-before_install: sudo aptitude update || true
+before_install: sudo apt-get update
 
-install: sudo aptitude install libsdl2-dev -y
+install: sudo apt-get install -y libsdl2-dev
 
 script: make -f thegameoflife.cbp.mak
