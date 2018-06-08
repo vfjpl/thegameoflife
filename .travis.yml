@@ -10,5 +10,7 @@ addons:
   coverity_scan:
     project:
       name: "vfjpl/thegameoflife"
+      description: "Build submitted via Travis CI"
+    notification_email: cosiekvfj@o2.pl
     build_command: "make -f thegameoflife.cbp.mak"
     branch_pattern: master
