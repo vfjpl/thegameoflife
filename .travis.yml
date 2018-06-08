@@ -1,9 +1,5 @@
-language: cpp
-
-before_install: sudo aptitude update || true
-
-install:
-  -  sudo aptitude install -y libegl1-mesa-dev libgles2-mesa-dev
-  -  sudo aptitude install -y libsdl2-dev
+addons:
+  apt:
+    packages: libsdl2-dev
 
 script: make -f thegameoflife.cbp.mak
