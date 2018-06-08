@@ -2,4 +2,6 @@ language: cpp
 
 before_install: sudo aptitude update || true
 
+install: sudo aptitude install libsdl2-dev -y
+
 script: make -f thegameoflife.cbp.mak
