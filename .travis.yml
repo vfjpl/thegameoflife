@@ -1,12 +1,12 @@
 language: cpp
 
-env:
-  global:
-    -  secure: "Dl6gFyolA35leCUByrGpNVfvYODDokU7fikcouzY8gV6JdF42QdLPxcr6eqHNM8+GPriSVs1kpm0y9HAQLKOKIZgVxoMLV/wfbxIEA0rbOAbeKUEku6Liey33Y/ta2ZJ1del7iWI9sqAvfMmxGPJgKaQm+lLQhDC3T1Jpqj3bQ/ydLUdtbTcOKLeW83hTI8BqYafoLhpBGOkiqEf45ZwaAEYcKV6rGOWeOnAzkv8lTafFnXtD+xqXGbfktkHj48zW4L0rlttxGHz2SfTmDoUpCN0vLwNxUNLDbB7VYUtpCBEYGOQ+egjp8bWKBSGzwztJL7Q4l3jIPIn9HgbpqoUrFOj9txfBXB6HD/DKedJLbKYeNELOIVpLQLujRzTKefNJCmm6mIHM2bwNQ4SYe17tcDbEleFexwuAKCjJUJGvXJfpCwL6WVwrgbe4jsosEwg/f4kXUnHADslrH+f4oSbxCKdLex6idqvsN07ylFcWWQOwc7v2cMOf4JNwVIYZNUzzOTd5eN7FjPAC8j0JtJe55W1cWvNZoBMazJNHZyaMcx/UF7YYorwwr9xC0dGVR0LAnLlngRNeqByMW9ZLs0+ZO7zrnAgYeftG00fJYhf3k4K7DGiTAxROjZvSKSncF7RcfeizCdiAS045MOXXx+9uw9L+TJCqrDWA05ZzF1yhhU="
-
 addons:
+  apt:
+    packages: libsdl2-dev
+
   coverity_scan:
     project:
-      name: "vfjpl/thegameoflife"
-    build_command: "make -f thegameoflife.cbp.mak"
-    branch_pattern: coverity_scan
+      name: vfjpl/thegameoflife
+    notification_email: cosiekvfj@o2.pl
+    build_command: make -f thegameoflife.cbp.mak
+    branch_pattern: master
