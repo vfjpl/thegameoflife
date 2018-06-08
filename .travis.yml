@@ -1,5 +1,16 @@
+language: cpp
+
+env:
+  global:
+    -  secure: "nfKNT/HUNiS30PMX/bjpvonVpdZqSqo75YiCQwBcMT1a4tcGoc/PRgcZ/4rGwnRQD9YHSAI3Q7IEIjzHYMgLFIGpu1fqitYtKdoYWb/biV7VKAEtlmQocXeblUGat9uH/RdvH9Z451T74nUougLgDuz+lfKh2LrjSPT7XU7D3UkXvRtwCR+xdz9aVKB6MKleAfwZsy7T1h1lNxfBM8VYh3BORRpPOVAFfFWjEzaXlUabIyXW7KpLyV2kaT1/8tPlXjtoeEk2uQuIfWDklwn/9HHlMUu67IIIb+NH+aiwo6+GAv3OuRYQ6mr7efiBA5kv1gRPArHOvdDOmqBIDyIE1ypTYRjfvbQilm7GMngxsly4Ad92QxWltUj0SLTjn9hwgB99F8KvlEECm8mh+OaqLW2aV/z5KSVYr4uS1AatZf6b/luAKIszD/jrDMCuSW7E702Kz87oulddwO+i09R6OwRwAwL8Jtc6fSiU1IaJLwX9NyQpXmHfMXxs4KKWP9rA4kZ637g3NwdTipeU9FgdBUZfSuvPWccds/qHmQetviPKMEUErvcFD5hqC6bcp33lNFqq5JA0bpJVKXu5U+rCdGklzRMYQoLoJ0EmDAgrK22Y+Z/JPSKdWi6CQyC/CQMMx5pBdFyE3GoWoiscEIIxnI31kuqOfgo5YAylA08CP28="
+
+before_install:
+  -  echo -n | openssl s_client -connect https://scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
+
 addons:
   apt:
     packages: libsdl2-dev
+
+  coverity_scan:
 
 script: make -f thegameoflife.cbp.mak
