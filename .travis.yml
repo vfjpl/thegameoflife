@@ -12,5 +12,7 @@ addons:
     packages: libsdl2-dev
 
   coverity_scan:
+    project:
+      name: "vfjpl/thegameoflife"
 
 script: make -f thegameoflife.cbp.mak
