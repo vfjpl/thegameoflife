@@ -11,4 +11,5 @@ addons:
   coverity_scan:
     project:
       name: "vfjpl/thegameoflife"
+    build_command: "make -f thegameoflife.cbp.mak"
     branch_pattern: master
