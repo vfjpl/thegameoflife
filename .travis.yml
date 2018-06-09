@@ -4,9 +4,4 @@ addons:
   apt:
     packages: libsdl2-dev
 
-  coverity_scan:
-    project:
-      name: vfjpl/thegameoflife
-    notification_email: cosiekvfj@o2.pl
-    build_command: make -f thegameoflife.cbp.mak
-    branch_pattern: master
+script: make -f thegameoflife.cbp.mak
